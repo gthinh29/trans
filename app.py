@@ -22,7 +22,12 @@ from logic.log_handler import task_log_handler, task_local
 
 # --- Cấu hình ứng dụng và Database ---
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.instance_path, 'app.db')
+# Sửa đổi để sử dụng DATABASE_URL từ môi trường của Render
+database_uri = os.environ.get('DATABASE_URL')
+if database_uri and database_uri.startswith("postgres://"):
+    database_uri = database_uri.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = database_uri or 'sqlite:///' + os.path.join(app.instance_path, 'app.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'a-very-secret-key-for-flash-messages'
 
