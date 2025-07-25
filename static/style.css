@@ -1,0 +1,872 @@
+/* =================================================================
+   STYLE.CSS - PHIÊN BẢN NÂNG CẤP TOÀN DIỆN
+   Tác giả: Gemini (Trợ lý AI của Google)
+   Mô tả: Tối ưu hóa giao diện, thêm hiệu ứng hiện đại,
+   cải thiện độ tương thích và cấu trúc lại mã nguồn.
+   ================================================================= */
+
+/* =================================================================
+   1. KHAI BÁO BIẾN (CSS VARIABLES) VÀ FONT CHỮ
+   ================================================================= */
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap');
+
+:root {
+    /* Bảng màu chính */
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+
+    /* Tông màu nền và chữ */
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --white-color: #ffffff;
+    --text-color: #212529;
+    --text-muted: #6c757d;
+
+    /* Viền và bóng đổ */
+    --border-color: #dee2e6;
+    --border-radius: 8px; /* Bo góc thống nhất */
+    --box-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --box-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --box-shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.15);
+
+    /* Font chữ */
+    --font-family-sans-serif: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    
+    /* Hiệu ứng chuyển động */
+    --transition-fast: all 0.2s ease-in-out;
+    --transition-normal: all 0.3s ease-in-out;
+}
+
+
+/* =================================================================
+   2. RESET VÀ THIẾT LẬP CƠ BẢN (BASE STYLES)
+   ================================================================= */
+*,
+*::before,
+*::after {
+    box-sizing: border-box; /* Giúp việc tính toán kích thước dễ dàng hơn */
+}
+
+html {
+    scroll-behavior: smooth; /* Cuộn trang mượt mà */
+}
+
+body {
+    font-family: var(--font-family-sans-serif);
+    background-color: var(--light-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    line-height: 1.7; /* Tăng khoảng cách dòng để dễ đọc hơn */
+    -webkit-font-smoothing: antialiased; /* Làm chữ mượt hơn trên macOS/iOS */
+    -moz-osx-font-smoothing: grayscale;
+}
+
+
+/* =================================================================
+   3. BỐ CỤC CHÍNH (LAYOUT)
+   ================================================================= */
+.container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 15px;
+    background: var(--white-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow-md);
+    overflow: hidden; /* Đảm bảo các thành phần con không tràn ra ngoài */
+}
+
+.content {
+    padding: 30px 40px;
+}
+
+/* Các layout Grid dùng chung */
+.display-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+.log-grid {
+    margin-top: 30px;
+}
+
+
+/* =================================================================
+   4. THANH ĐIỀU HƯỚNG (NAVIGATION)
+   ================================================================= */
+nav {
+    background: var(--dark-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    border-bottom: 4px solid var(--primary-color);
+}
+
+nav a {
+    color: var(--white-color);
+    text-decoration: none;
+    font-weight: 600; /* Điều chỉnh độ đậm */
+    padding: 18px 20px;
+    display: inline-block;
+    position: relative;
+    transition: var(--transition-fast);
+    font-size: 1.1em; /* Kích thước chữ đồng nhất */
+}
+
+nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 10px;
+    left: 20px;
+    right: 20px;
+    height: 2px;
+    background-color: var(--primary-color);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+nav a:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+nav a:hover::after {
+    transform: scaleX(1);
+}
+
+
+/* =================================================================
+   5. TIÊU ĐỀ VÀ VĂN BẢN (TYPOGRAPHY)
+   ================================================================= */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--dark-color);
+    font-weight: 700;
+    line-height: 1.3;
+}
+h1 {
+    font-size: 2.25rem;
+    text-align: center;
+    padding-bottom: 20px;
+    margin: 0 0 30px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+h2 { font-size: 1.75rem; }
+h3 { font-size: 1.25rem; margin-top: 0; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+
+
+/* =================================================================
+   6. NÚT BẤM (BUTTONS) - ĐÃ RESET HOÀN CHỈNH
+   ================================================================= */
+.btn {
+    /* Reset lại nút bấm */
+    -webkit-appearance: none;
+    appearance: none;
+    border: 1px solid transparent; /* Thêm border trong suốt để không bị giật khi hover */
+
+    /* Style chung */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 28px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: var(--font-family-sans-serif);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: var(--transition-fast);
+    box-shadow: var(--box-shadow-sm);
+}
+
+.btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--box-shadow-md);
+}
+
+.btn:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: var(--box-shadow-sm);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Các loại nút */
+.btn-primary { background-color: var(--primary-color); color: var(--white-color); }
+.btn-success { background-color: var(--success-color); color: var(--white-color); }
+.btn-danger { background-color: var(--danger-color); color: var(--white-color); }
+.btn-secondary { background-color: var(--secondary-color); color: var(--white-color); }
+.btn-outline-primary {
+    background-color: transparent;
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+
+
+/* =================================================================
+   7. FORM VÀ CÁC TRƯỜNG NHẬP LIỆU
+   ================================================================= */
+.form-section {
+    margin-bottom: 30px;
+    padding: 30px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: #fafbfe;
+}
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-sizing: border-box;
+    font-size: 1rem;
+    font-family: var(--font-family-sans-serif);
+    transition: var(--transition-fast);
+}
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+}
+
+
+/* =================================================================
+   8. CÁC THÀNH PHẦN GIAO DIỆN ĐẶC THÙ
+   ================================================================= */
+/* Bảng điều khiển */
+.control-panel {
+    background: #f1f3f5;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    margin-bottom: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+}
+.stop-btn { display: none; }
+
+/* Thanh trạng thái */
+.status-bar {
+    padding: 15px;
+    margin-bottom: 25px;
+    border-radius: var(--border-radius);
+    color: var(--white-color);
+    font-weight: 600;
+    text-align: center;
+    transition: var(--transition-normal);
+    box-shadow: var(--box-shadow-sm);
+}
+
+/* Các ô hiển thị text */
+.text-area,
+.log-area {
+    min-height: 60vh;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    overflow-y: auto;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    background: var(--white-color);
+    font-family: 'SF Mono', 'Courier New', monospace;
+    font-size: 14px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);
+}
+.log-area {
+    background: #2B303B; /* Nền tối, dễ nhìn hơn */
+    color: #C0C5CE;
+}
+
+/* Tin nhắn Flash */
+.flash-messages {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 25px 0;
+}
+.flash-messages li {
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    border-radius: var(--border-radius);
+    border: 1px solid transparent;
+    font-weight: 500;
+    box-shadow: var(--box-shadow-sm);
+}
+.flash-messages .success { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
+.flash-messages .error { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+
+/* Bảng */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 25px;
+    box-shadow: var(--box-shadow-md);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+th, td {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: left;
+}
+th {
+    background-color: #f1f3f5;
+    font-weight: 600;
+}
+tr:last-child td {
+    border-bottom: none;
+}
+tr:hover {
+    background-color: #f8f9fa;
+}
+
+
+/* =================================================================
+   BUTTON STYLES (Thêm các style nút mới này)
+   ================================================================= */
+.btn-sm {
+    padding: 6px 14px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.btn-outline-light {
+    color: #f8f9fa;
+    border: 1px solid #f8f9fa;
+    background-color: transparent;
+}
+.btn-outline-light:hover {
+    color: var(--dark-color);
+    background-color: #f8f9fa;
+    border-color: #f8f9fa;
+}
+
+
+/* =================================================================
+   9. RESPONSIVE - PHIÊN BẢN TINH GỌN CUỐI CÙNG
+   ================================================================= */
+@media (max-width: 768px) {
+    .container {
+        margin: 0;
+        padding: 0;
+        border-radius: 0;
+    }
+    .content {
+        padding: 15px;
+    }
+
+    /* Header và Nav mới cho mobile */
+    .main-header {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background-color: var(--dark-color); /* Thêm màu nền cho header */
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        min-height: 60px; /* Đảm bảo header không quá mỏng */
+    }
+    .nav-brand {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    /* Ghi đè để nút Quản lý không bị chiếm hết chiều rộng */
+    .nav-right .btn {
+        width: auto;
+    }
+
+    /* Các tinh chỉnh khác cho mobile */
+    h1 { font-size: 1.8rem; }
+    h2 { font-size: 1.4rem; }
+
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+/* =================================================================
+   10. PHẦN CHỈNH SỬA BỔ SUNG - PHIÊN BẢN GỌN GÀNG
+   ================================================================= */
+
+/* Căn chỉnh lại các nút Hành động cho nhỏ gọn và bằng nhau */
+.action-buttons {
+    display: flex;
+    align-items: center; /* Căn các nút thẳng hàng */
+    gap: 8px; /* Giảm khoảng cách giữa 2 nút */
+}
+
+/* Thiết lập kích thước và hình dáng cho các nút bên trong */
+.action-buttons .btn {
+    /* Đặt chiều rộng tối thiểu để nút "Xóa" bằng nút "Quản lý" */
+    min-width: 90px;
+    
+    /* Giảm padding và cỡ chữ để nút nhỏ lại */
+    padding: 8px 12px;
+    font-size: 14px;
+
+    /* Quan trọng: Ngăn nút tự động co giãn to ra */
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    /* Đảm bảo text trong nút luôn ở giữa */
+    justify-content: center;
+    text-align: center;
+}
+
+/* Reset lại thẻ form bao quanh nút Xóa để không ảnh hưởng layout */
+.action-buttons > form {
+    margin: 0;
+}
+
+/* =================================================================
+   11. STYLE CHO TRANG ĐỌC TRUYỆN
+   ================================================================= */
+
+.chapter-content {
+    /* Quan trọng: Giữ lại tất cả các dấu xuống dòng và khoảng trắng */
+    white-space: pre-wrap;
+
+    /* Tăng khoảng cách dòng để dễ đọc hơn */
+    line-height: 1.9;
+
+    /* Tăng cỡ chữ một chút cho thoải mái */
+    font-size: 1.1rem;
+
+    /* Căn đều hai bên cho giống trang sách */
+    text-align: justify;
+}
+
+/* =================================================================
+   12. STYLE CHO NÚT CHUYỂN CHƯƠNG
+   ================================================================= */
+
+.chapter-navigation {
+    display: flex;
+    justify-content: space-between; /* Đẩy 2 nút ra 2 phía */
+    align-items: center;
+    margin-top: 25px;
+    margin-bottom: 25px;
+    padding-top: 25px;
+}
+
+/* Ghi đè để các nút này không bị giãn ra toàn chiều rộng */
+.chapter-navigation .btn {
+    width: auto;
+    flex-grow: 0; /* Ngăn nút tự phình to */
+}
+
+/* =================================================================
+   13. STYLE CHO TRANG CHI TIẾT TRUYỆN
+   ================================================================= */
+
+/* Khung chính chứa ảnh bìa và thông tin */
+.novel-header {
+    display: flex;
+    gap: 30px; /* Khoảng cách giữa ảnh và chữ */
+    margin: 20px 0 30px 0;
+    align-items: flex-start; /* Căn các cột theo lề trên */
+}
+
+/* Cột ảnh bìa */
+.novel-cover {
+    flex-shrink: 0; /* Ngăn ảnh bị co lại khi không đủ chỗ */
+    width: 200px;
+}
+
+.novel-cover img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px; /* Bo góc mềm mại hơn */
+    box-shadow: var(--box-shadow-md);
+    object-fit: cover;
+}
+
+/* Ảnh bìa mặc định khi không có ảnh */
+.cover-placeholder {
+    width: 200px;
+    height: 280px;
+    background-color: #e9ecef;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 15px;
+    font-weight: 600;
+    color: var(--text-muted);
+    box-shadow: var(--box-shadow-sm);
+}
+
+/* Cột thông tin truyện */
+.novel-info {
+    flex-grow: 1; /* Cho phép cột này chiếm hết không gian còn lại */
+}
+
+.novel-info p {
+    margin: 0;
+    padding: 0;
+    line-height: 1.7;
+}
+
+.novel-info .info-author {
+    font-size: 1.2rem;
+    color: var(--text-color);
+    margin-bottom: 15px;
+}
+
+.novel-info .info-description {
+    font-size: 1rem;
+    color: var(--text-muted);
+    text-align: justify;
+}
+
+
+/* Định dạng lại danh sách chương */
+.chapter-list h2 {
+    border: none;
+    text-align: left;
+    padding: 0;
+    margin-bottom: 15px;
+}
+
+.chapter-list table {
+    box-shadow: none;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+.chapter-list td a {
+    text-decoration: none;
+    font-weight: 500;
+    color: var(--primary-color);
+    transition: color 0.2s ease;
+    display: block; /* Giúp link chiếm hết ô để dễ bấm */
+}
+
+.chapter-list tr:hover a {
+    color: var(--dark-color);
+}
+
+/* =================================================================
+   14. STYLE CHO TAGS
+   ================================================================= */
+.novel-tags {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag-badge {
+    background-color: #e9ecef;
+    color: var(--text-muted);
+    padding: 5px 12px;
+    border-radius: 20px; /* Bo tròn như viên thuốc */
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* =================================================================
+   15. CĂN CHỈNH LẠI TRANG CHI TIẾT TRUYỆN
+   ================================================================= */
+
+/* Cập nhật lại cột thông tin truyện */
+.novel-info {
+    display: flex;            /* Bật Flexbox */
+    flex-direction: column;   /* Sắp xếp các mục theo chiều dọc */
+    justify-content: center;  /* Căn các mục ra giữa theo chiều dọc */
+    gap: 15px;                /* Tạo khoảng cách đều giữa các mục */
+}
+
+/* Ghi đè lại margin cũ để dùng gap cho nhất quán */
+.novel-info p, .novel-tags {
+    margin: 0;
+}
+
+/* Tinh chỉnh lại style cho tác giả và mô tả */
+.novel-info .info-author {
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+.novel-info .info-description {
+    font-size: 1rem;
+    color: var(--text-muted);
+    text-align: justify;
+    line-height: 1.6;
+}
+
+/* Giữ nguyên style cho tags */
+.novel-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* =================================================================
+   16. STYLE NÂNG CẤP CHO TRANG CHI TIẾT TRUYỆN
+   ================================================================= */
+
+/* Bố cục Grid 2 cột chính */
+.novel-detail-grid {
+    display: grid;
+    grid-template-columns: 220px 1fr; /* Cột trái 220px, cột phải chiếm phần còn lại */
+    gap: 40px;
+    margin-top: 20px;
+}
+
+/* Cột trái */
+.novel-detail-left .novel-cover {
+    margin-bottom: 20px;
+}
+.novel-metadata ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.novel-metadata li {
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: flex-start;
+}
+.novel-metadata li strong {
+    color: var(--text-color);
+    margin-left: 8px;
+    margin-right: 5px;
+}
+.meta-icon {
+    font-size: 1.1rem;
+    line-height: 1.5;
+}
+
+/* Cột phải */
+.novel-detail-right h1 {
+    text-align: left;
+    border: none;
+    padding: 0;
+    margin: 0 0 10px 0;
+    font-size: 2.5rem;
+}
+.star-rating {
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.star-rating .stars {
+    font-size: 1.5rem;
+    color: #ffc107;
+}
+.star-rating .rating-text {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+.summary h3 {
+    border-bottom: 2px solid var(--primary-color);
+    display: inline-block;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+.summary p {
+    line-height: 1.7;
+    text-align: justify;
+}
+
+/* Các nút hành động */
+.novel-actions {
+    margin-top: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+.novel-actions .btn {
+    flex: 1 1 0; /* Cách viết tắt cho flex-grow, flex-shrink, và flex-basis */
+    text-align: center; /* Đảm bảo chữ luôn ở giữa */
+}
+
+/* Responsive cho di động */
+@media (max-width: 768px) {
+    .novel-detail-grid {
+        grid-template-columns: 1fr; /* Chuyển thành 1 cột */
+        gap: 20px;
+    }
+    .novel-detail-right h1 {
+        font-size: 1.8rem;
+        text-align: center;
+    }
+    .star-rating {
+        justify-content: center;
+    }
+    .novel-detail-left {
+        display: flex; /* Trên mobile, cho ảnh và metadata nằm ngang */
+        gap: 20px;
+        align-items: flex-start;
+    }
+    .novel-detail-left .novel-cover {
+        width: 120px;
+    }
+}
+
+/* =================================================================
+   17. TINH CHỈNH TRANG ĐỌC TRUYỆN
+   ================================================================= */
+
+
+/* Căn giữa 3 nút điều hướng một cách hoàn hảo */
+.chapter-navigation {
+    justify-content: space-between;
+}
+
+/* Trong file static/style.css */
+.btn-info { background-color: var(--info-color); color: var(--white-color); }
+
+/* =================================================================
+   18. STYLE CHO TRANG LỊCH SỬ (DÙNG CSS GRID - ỔN ĐỊNH)
+   ================================================================= */
+
+/* Ghi đè lại h1 trong trang này để không bị căn giữa và có gạch chân */
+.container h1.h2 {
+    text-align: left;
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+/* Khung Grid chính */
+.diff-grid-container {
+    display: grid;
+    /* Chia làm 2 cột có chiều rộng bằng nhau */
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+}
+
+/* Từng cột trong Grid */
+.diff-column {
+    overflow: hidden; /* Đảm bảo nội dung không tràn ra ngoài */
+}
+.diff-column:first-child {
+    border-right: 1px solid var(--border-color);
+}
+
+/* Tiêu đề của mỗi cột */
+.diff-header {
+    background-color: #f8f9fa;
+    padding: 10px 15px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color);
+    font-family: var(--font-family-sans-serif);
+    position: sticky; /* Dính lại khi cuộn */
+    top: 0;
+    z-index: 10;
+}
+
+/* Thẻ <pre> chứa nội dung so sánh */
+.diff-column pre {
+    /* Rất quan trọng: Giữ các dấu xuống dòng và tự động ngắt khi cần */
+    white-space: pre-wrap;
+    /* Rất quan trọng: Ngắt cả những từ dài không có khoảng trắng */
+    word-break: break-word;
+
+    /* Reset các style mặc định của trình duyệt */
+    margin: 0;
+    padding: 15px;
+    font-family: 'SF Mono', 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* Thẻ <span> chứa từng dòng nội dung */
+.diff-column pre span {
+    display: block; /* Đảm bảo mỗi span chiếm một dòng */
+    min-height: 1.6em; /* Đảm bảo các dòng trống vẫn có chiều cao */
+}
+
+
+/* Màu nền cho các dòng thay đổi */
+.diff_add {
+    background-color: rgba(40, 167, 69, 0.2);
+}
+.diff_sub {
+    background-color: rgba(220, 53, 69, 0.2);
+}
+
+/* =================================================================
+   19. STYLE CHO LỊCH SỬ THU GỌN (ACCORDION)
+   ================================================================= */
+
+/* Phần tóm tắt có thể click để mở */
+.diff-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background-color: var(--white-color);
+    border-top: 1px solid var(--border-color);
+    cursor: pointer;
+    list-style: none; /* Bỏ dấu tam giác mặc định của <summary> */
+    transition: background-color 0.2s ease;
+}
+
+.diff-summary::-webkit-details-marker {
+    display: none; /* Bỏ dấu tam giác mặc định trên Chrome/Safari */
+}
+
+.diff-summary:hover {
+    background-color: #f8f9fa;
+}
+
+.summary-text {
+    font-weight: 500;
+    color: var(--primary-color);
+    font-size: 0.95rem;
+}
+
+.summary-icon {
+    color: var(--text-muted);
+    transition: transform 0.3s ease;
+}
+
+/* Xoay icon khi mở details */
+.diff-details[open] > .diff-summary .summary-icon {
+    transform: rotate(180deg);
+}
+
+/* Bỏ viền của diff-grid-container vì card đã có rồi */
+.diff-content-wrapper .diff-grid-container {
+    border: none;
+    border-radius: 0;
+}

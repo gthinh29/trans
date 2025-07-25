@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Quản lý truyện{% endblock %}
+{% block content %}
+<h1>Quản lý truyện</h1>
+
+<a href="{{ url_for('add_novel') }}" class="btn btn-success" style="margin-bottom: 20px;">+ Thêm truyện mới</a>
+
+<table>
+    <thead>
+        <tr>
+            <th>Tiêu đề</th>
+            <th style="width: 15%;">Số chương</th>
+            <th style="width: 20%;">Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for novel in novels %}
+        <tr>
+            <td><b>{{ novel.title }}</b></td>
+            <td>{{ novel.chapters|length }}</td>
+            <td class="action-buttons">
+                <a href="{{ url_for('manage_novel_detail', novel_id=novel.id) }}" class="btn btn-primary">Quản lý</a>
+                <form action="{{ url_for('delete_novel', novel_id=novel.id) }}" method="post" onsubmit="return confirm('Bạn có chắc muốn xóa truyện này và toàn bộ các chương của nó?');">
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="3" style="text-align: center;">Chưa có truyện nào.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

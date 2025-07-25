@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Chương {{ chapter.chapter_number }}{% endblock %}
+{% block content %}
+
+<h1>{{ chapter.novel.title }}</h1>
+<h2>Chương {{ chapter.chapter_number }}: {{ chapter.title }}</h2>
+
+<div class="chapter-navigation">
+    {% if prev_chapter_id %}
+        <a href="{{ url_for('read_chapter', chapter_id=prev_chapter_id) }}" class="btn btn-secondary">&larr; Chương Trước</a>
+    {% else %}
+        <a href="#" class="btn btn-secondary" style="pointer-events: none; opacity: 0.6;">&larr; Chương Trước</a>
+    {% endif %}
+    
+    <a href="{{ url_for('public_novel', novel_id=chapter.novel_id) }}" class="btn btn-outline-primary">Danh sách chương</a>
+
+    {% if next_chapter_id %}
+        <a href="{{ url_for('read_chapter', chapter_id=next_chapter_id) }}" class="btn btn-primary">Chương Tiếp &rarr;</a>
+    {% else %}
+        <a href="#" class="btn btn-primary" style="pointer-events: none; opacity: 0.6;">Chương Tiếp &rarr;</a>
+    {% endif %}
+</div>
+
+<div class="chapter-content">
+    {% if chapter.translated_content %}
+        {{ chapter.translated_content | nl2p | safe }}
+    {% else %}
+        <p><i>Chương này chưa được dịch.</i></p>
+    {% endif %}
+</div>
+
+<div class="chapter-navigation">
+    {% if prev_chapter_id %}
+        <a href="{{ url_for('read_chapter', chapter_id=prev_chapter_id) }}" class="btn btn-secondary">&larr; Chương Trước</a>
+    {% else %}
+        <a href="#" class="btn btn-secondary" style="pointer-events: none; opacity: 0.6;">&larr; Chương Trước</a>
+    {% endif %}
+
+    <a href="{{ url_for('public_novel', novel_id=chapter.novel_id) }}" class="btn btn-outline-primary">Danh sách chương</a>
+
+    {% if next_chapter_id %}
+        <a href="{{ url_for('read_chapter', chapter_id=next_chapter_id) }}" class="btn btn-primary">Chương Tiếp &rarr;</a>
+    {% else %}
+        <a href="#" class="btn btn-primary" style="pointer-events: none; opacity: 0.6;">Chương Tiếp &rarr;</a>
+    {% endif %}
+</div>
+
+{% block scripts %}
+<script>
+    // Khi trang đọc truyện được tải, lưu lại tiến trình đọc của truyện này
+    document.addEventListener('DOMContentLoaded', function() {
+        const novelId = {{ chapter.novel_id }};
+        const chapterId = {{ chapter.id }};
+        
+        // Tạo một đối tượng để lưu tiến trình của tất cả các truyện
+        let readingProgress = JSON.parse(localStorage.getItem('readingProgress')) || {};
+        
+        // Cập nhật chương cuối cùng đã đọc cho truyện hiện tại
+        readingProgress[novelId] = chapterId;
+        
+        // Lưu lại vào localStorage
+        localStorage.setItem('readingProgress', JSON.stringify(readingProgress));
+        console.log(`Đã lưu tiến trình: Truyện ${novelId}, Chương ${chapterId}`);
+    });
+</script>
+{% endblock %}
+
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}{{ novel.title }}{% endblock %}
+{% block content %}
+
+<div class="novel-detail-grid">
+
+    <div class="novel-detail-left">
+        <div class="novel-cover">
+            {% if novel.cover_image %}
+                <img src="{{ novel.cover_image }}" alt="{{ novel.title }}">
+            {% else %}
+                <div class="cover-placeholder"><span>{{ novel.title }}</span></div>
+            {% endif %}
+        </div>
+        <div class="novel-metadata">
+            <ul>
+                <li><span class="meta-icon">👤</span><strong>Tác giả:</strong> {{ novel.author or 'Chưa cập nhật' }}</li>
+                <li><span class="meta-icon">🏷️</span><strong>Thể loại:</strong> 
+                    {% if novel.tags %}
+                        {{ novel.tags|map(attribute='name')|join(', ') }}
+                    {% else %}
+                        Chưa phân loại
+                    {% endif %}
+                </li>
+                </ul>
+        </div>
+    </div>
+
+    <div class="novel-detail-right">
+    <h1>{{ novel.title }}</h1>
+
+    <div class="summary">
+        <h3>TÓM TẮT</h3>
+        <p>{{ novel.description or 'Truyện chưa có mô tả.' }}</p>
+    </div>
+
+    <div class="novel-actions">
+        
+        {% if first_chapter_id %}
+            <a href="{{ url_for('read_chapter', chapter_id=first_chapter_id) }}" class="btn btn-primary">Đọc từ đầu</a>
+        {% endif %}
+
+        {% if first_chapter_id %}
+             <a href="{{ url_for('read_chapter', chapter_id=first_chapter_id) }}" class="btn btn-secondary" id="continue-reading-btn">Đọc tiếp</a>
+        {% endif %}
+
+        {% if last_chapter_id %}
+            <a href="{{ url_for('read_chapter', chapter_id=last_chapter_id) }}" class="btn btn-success">Đọc chương cuối</a>
+        {% endif %}
+        
+    </div>
+</div>
+
+<hr>
+
+<div class="chapter-list" id="chapter-list"> <h2>Danh sách chương</h2>
+    <table>
+        <tbody>
+            {% for chapter in chapters %}
+            <tr>
+                <td data-label="Chương {{ chapter.chapter_number }}">
+                    <a href="{{ url_for('read_chapter', chapter_id=chapter.id) }}">
+                        Chương {{ chapter.chapter_number }}: {{ chapter.title }}
+                    </a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td>Chưa có chương nào.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% block scripts %}
+<script>
+    // Khi trang chi tiết truyện được tải, kiểm tra tiến trình đã lưu
+    document.addEventListener('DOMContentLoaded', function() {
+        const novelId = {{ novel.id }};
+        const continueBtn = document.getElementById('continue-reading-btn');
+        
+        if (continueBtn) {
+            // Lấy toàn bộ tiến trình đọc từ localStorage
+            const readingProgress = JSON.parse(localStorage.getItem('readingProgress')) || {};
+            
+            // Lấy ID chương cuối cùng đã đọc của riêng truyện này
+            const lastReadChapterId = readingProgress[novelId];
+            
+            if (lastReadChapterId) {
+                // Nếu có, cập nhật lại link của nút "Đọc tiếp"
+                continueBtn.href = `/chapter/${lastReadChapterId}`;
+                console.log(`Đã tìm thấy tiến trình: Chương cuối đã đọc là ${lastReadChapterId}. Cập nhật nút 'Đọc tiếp'.`);
+            } else {
+                console.log('Chưa có tiến trình đọc cho truyện này.');
+            }
+        }
+    });
+</script>
+{% endblock %}
+
+{% endblock %}

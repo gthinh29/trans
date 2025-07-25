@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Novel Translator Pro{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="main-header">
+    <nav>
+        <div class="nav-left">
+            <a href="{{ url_for('public_index') }}" class="nav-brand">Trang Đọc Truyện</a>
+        </div>
+        <div class="nav-right">
+            <a href="{{ url_for('manage_dashboard') }}" class="btn btn-outline-light btn-sm">Quản Lý</a>
+        </div>
+    </nav>
+</header>
+
+<main class="container">
+    <div class="content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flash-messages">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+</main>
+    <script>
+        // Hàm JavaScript chung để xử lý stream, đã sửa lỗi và hoàn thiện
+        function handleStream(taskId, elements) {
+            elements.startButton.style.display = 'none';
+            elements.stopButton.style.display = 'inline-block';
+            elements.startButton.disabled = true;
+
+            if (elements.originalTextArea) elements.originalTextArea.textContent = '';
+            if (elements.translatedTextArea) elements.translatedTextArea.textContent = '';
+            if (elements.logArea) elements.logArea.textContent = '';
+
+            elements.statusBar.textContent = 'Đã gửi yêu cầu. Đang kết nối đến stream...';
+            elements.statusBar.style.backgroundColor = '#17a2b8'; // Info color
+            
+            const eventSource = new EventSource(`/task-stream/${taskId}`);
+
+            elements.stopButton.onclick = () => {
+                fetch(`/stop-task/${taskId}`, { method: 'POST' });
+                elements.statusBar.textContent = 'Đang yêu cầu dừng...';
+                elements.stopButton.disabled = true;
+            };
+
+            const finalize = () => {
+                eventSource.close();
+                elements.startButton.style.display = 'inline-block';
+                elements.stopButton.style.display = 'none';
+                elements.startButton.disabled = false;
+                elements.stopButton.disabled = false;
+            };
+
+            eventSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                const autoScroll = (el) => { if(el) el.scrollTop = el.scrollHeight; };
+
+                switch(data.type) {
+                    case 'status': elements.statusBar.textContent = data.content; break;
+                    case 'original_text': if(elements.originalTextArea) elements.originalTextArea.textContent = data.content; break;
+                    case 'original_text_append': if(elements.originalTextArea) elements.originalTextArea.textContent += data.content; break;
+                    case 'translated_text_reset': if(elements.translatedTextArea) elements.translatedTextArea.textContent = ''; break;
+                    case 'translated_text_append': if(elements.translatedTextArea) elements.translatedTextArea.textContent += data.content; break;
+                    case 'translated_chunk': if(elements.translatedTextArea) elements.translatedTextArea.textContent += data.content; break;
+                    case 'log': if(elements.logArea) elements.logArea.textContent += data.content + '\n'; break;
+                    case 'new_doc_id': if(elements.docIdInput) elements.docIdInput.value = data.content; break;
+                    case 'error':
+                        elements.statusBar.textContent = `LỖI: ${data.content}`;
+                        elements.statusBar.style.backgroundColor = '#dc3545'; // Danger color
+                        finalize();
+                        break;
+                    case 'final':
+                        elements.statusBar.textContent = data.content;
+                        elements.statusBar.style.backgroundColor = '#28a745'; // Success color
+                        finalize();
+                        break;
+                }
+                autoScroll(elements.translatedTextArea);
+                autoScroll(elements.logArea);
+                autoScroll(elements.originalTextArea);
+            };
+
+            eventSource.onerror = () => {
+                elements.statusBar.textContent = 'Lỗi kết nối stream. Worker có thể đã dừng.';
+                elements.statusBar.style.backgroundColor = '#dc3545';
+                finalize();
+            };
+        }
+
+        async function findDocId(elements) {
+            const chapters = elements.chaptersInput.value;
+            if (!chapters) { alert('Vui lòng nhập số chương.'); return; }
+            elements.findButton.disabled = true;
+            elements.findButton.textContent = 'Đang tìm...';
+            try {
+                const response = await fetch(`/find-doc-id?chapters=${chapters}`);
+                const data = await response.json();
+                if (data.doc_id) {
+                    elements.docIdInput.value = data.doc_id;
+                    alert('Đã tìm thấy ID.');
+                } else { alert('Không tìm thấy file phù hợp.'); }
+            } catch (e) { alert('Lỗi khi tìm kiếm file.'); }
+            finally {
+                elements.findButton.disabled = false;
+                elements.findButton.textContent = 'Tìm ID';
+            }
+        }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

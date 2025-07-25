@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Danh sách truyện{% endblock %}
+{% block content %}
+
+<h1>Tất cả truyện</h1>
+<table>
+    <thead>
+        <tr>
+            <th style="width: 10%;">Bìa</th>
+            <th>Tiêu đề</th>
+            <th>Tác giả</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for novel in novels %}
+        <tr>
+            <td>
+                {% if novel.cover_image %}
+                    <img src="{{ novel.cover_image }}" alt="{{ novel.title }}" width="80" style="border-radius: 4px;">
+                {% endif %}
+            </td>
+            <td><a href="{{ url_for('public_novel', novel_id=novel.id) }}"><b>{{ novel.title }}</b></a></td>
+            <td>{{ novel.author }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="3" style="text-align: center;">Chưa có truyện nào. Vui lòng vào trang quản lý để thêm.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

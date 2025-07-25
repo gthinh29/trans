@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title or 'Thêm/Sửa Thông Tin Truyện' }}</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- Thiết lập cơ bản --- */
+        :root {
+            --primary-color: #3b82f6; /* Màu xanh dương hiện đại */
+            --secondary-color: #6b7280; /* Màu xám cho nút Hủy */
+            --light-gray-bg: #f3f4f6; /* Màu nền xám RẤT NHẠT cho toàn trang */
+            --white-color: #ffffff;
+            --border-color: #d1d5db;
+            --text-dark: #111827;
+            --text-light: #4b5563;
+            --border-radius-md: 8px;
+            --border-radius-lg: 12px;
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--light-gray-bg);
+            font-family: 'Be Vietnam Pro', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 15px;
+            min-height: 100vh;
+        }
+
+        /* --- Khung Form chính --- */
+        .form-wrapper {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--white-color);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden; /* Đảm bảo bo góc hoạt động cho header/footer */
+        }
+
+        /* --- Header của Form --- */
+        .form-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .form-header .icon {
+            font-size: 1.25rem;
+            color: var(--primary-color);
+        }
+
+        .form-header .title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        /* --- Phần thân của Form --- */
+        .form-body {
+            padding: 24px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        /* Cho các trường chiếm toàn bộ chiều rộng */
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* --- Nhãn (Label) và Icon --- */
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        /* --- Các ô nhập liệu (Input, Textarea) --- */
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            background-color: var(--white-color);
+            font-size: 1rem;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            transition: all 0.2s ease-in-out;
+            box-sizing: border-box; /* Quan trọng */
+        }
+        
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+            color: #9ca3af;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .form-help-text {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 6px;
+        }
+
+        /* --- Footer và các nút bấm --- */
+        .form-actions {
+            padding: 16px 24px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 24px;
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none; /* DÒNG NÀY ĐÃ ĐƯỢC THÊM VÀO ĐỂ BỎ GẠCH CHÂN */
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white-color);
+        }
+
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: var(--text-dark);
+        }
+
+        /* --- Responsive cho mobile --- */
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+            }
+            .form-wrapper {
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-wrapper">
+        <header class="form-header">
+            <i class="fas fa-edit icon"></i>
+            <h1 class="title">{{ title or 'Thêm/Sửa Thông Tin Truyện' }}</h1>
+        </header>
+
+        <form id="novel-form" method="post" action="{{ url_for('add_novel') if not novel else url_for('edit_novel', novel_id=novel.id) }}">
+            <div class="form-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="title" class="form-label"><i class="fas fa-heading"></i>Tên truyện</label>
+                        <input type="text" class="form-input" id="title" name="title" value="{{ novel.title if novel else '' }}" required placeholder="Nhập tên truyện...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="author" class="form-label"><i class="fas fa-user-edit"></i>Tác giả</label>
+                        <input type="text" class="form-input" id="author" name="author" value="{{ novel.author if novel else '' }}" placeholder="Nhập tên tác giả...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="source_url" class="form-label"><i class="fas fa-link"></i>Link nguồn truyện (URL)</label>
+                        <input type="url" class="form-input" id="source_url" name="source_url" value="{{ novel.source_url if novel else '' }}" placeholder="https://web-source.com/novel/your-novel">
+                        <p class="form-help-text">Link đến trang chính của truyện để lấy nội dung gốc.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cover_image" class="form-label"><i class="fas fa-image"></i>Link ảnh bìa (URL)</label>
+                        <input type="url" class="form-input" id="cover_image" name="cover_image" value="{{ novel.cover_image if novel else '' }}" placeholder="https://imgur.com/your-image.jpg">
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="tags" class="form-label"><i class="fas fa-tags"></i>Tags (phân cách bằng dấu phẩy)</label>
+                    <input type="text" class="form-input" id="tags" name="tags" value="{{ existing_tags if existing_tags else '' }}" placeholder="Action, Fantasy, Isekai...">
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="description" class="form-label"><i class="fas fa-paragraph"></i>Mô tả</label>
+                    <textarea class="form-textarea" id="description" name="description" rows="5" placeholder="Nhập mô tả chi tiết cho truyện...">{{ novel.description if novel else '' }}</textarea>
+                </div>
+            </div>
+        </form>
+        
+        <footer class="form-actions">
+            <a href="{{ url_for('manage_novel_detail', novel_id=novel.id) if novel else url_for('manage_dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-times"></i>Hủy
+            </a>
+            <button type="submit" form="novel-form" class="btn btn-primary">
+                <i class="fas fa-save"></i>Lưu lại
+            </button>
+        </footer>
+    </div>
+
+</body>
+</html>

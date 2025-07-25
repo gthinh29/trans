@@ -1,0 +1,336 @@
+{% extends "base.html" %}
+{% block title %}Quản lý: {{ novel.title }}{% endblock %}
+{% block content %}
+<h1>Quản lý: {{ novel.title }}</h1>
+<a href="{{ url_for('edit_novel', novel_id=novel.id) }}" class="btn btn-secondary" style="margin-bottom: 20px;">Chỉnh sửa thông tin truyện</a>
+
+<div class="form-section">
+    <h2>1. Dịch Hàng Loạt (Lưu vào Website)</h2>
+    <div class="control-panel">
+        <div class="form-group" style="flex-grow: 1;">
+            <label>Bắt đầu từ chương:</label>
+            <input type="number" id="db-start-chapter" value="1">
+        </div>
+        <div class="form-group" style="flex-grow: 1;">
+            <label>Đến chương:</label>
+            <input type="number" id="db-end-chapter" value="10">
+        </div>
+        <div class="form-group" style="flex-grow: 2;">
+            <label>&nbsp;</label>
+            <button id="start-db-translate-btn" class="btn btn-success">Bắt đầu Dịch & Lưu vào Web</button>
+        </div>
+    </div>
+</div>
+
+<div class="form-section">
+    <h2>2. Cải thiện bản dịch (Trong Website)</h2>
+    <div class="control-panel">
+        <div class="form-group" style="flex-grow: 2;">
+            <label>Số chương hoặc khoảng chương:</label>
+            <input type="text" id="proof-chapters" placeholder="1-10 hoặc 123">
+        </div>
+        <div class="form-group" style="flex-grow: 1;">
+            <label>&nbsp;</label>
+            <button id="start-proof-btn" class="btn btn-primary">Bắt đầu Cải Thiện</button>
+        </div>
+    </div>
+</div>
+
+<div class="form-section">
+    <h2>3. Tự Động Dịch</h2>
+    <div class="control-panel">
+        <div class="form-group">
+            <label>Bắt đầu từ chương:</label>
+            <input type="number" id="auto-start-chapter" value="1">
+        </div>
+         <div class="form-group checkbox-group align-to-bottom">
+            <input type="checkbox" id="auto-save-docs-checkbox" style="width: auto; margin-right: 5px;">
+            <label for="auto-save-docs-checkbox">Lưu ra Google Docs?</label>
+        </div>
+        <div class="form-group">
+            <label>Google Docs ID (nếu tick ở trên):</label>
+            <input type="text" id="auto-doc-id" placeholder="Để trống nếu tạo file mới">
+        </div>
+        <div class="form-group">
+            <label>&nbsp;</label>
+            <button id="start-auto-btn" class="btn btn-secondary">Bắt đầu Tự Động</button>
+        </div>
+    </div>
+</div>
+
+<div class="form-section">
+    <h2>4. Sửa Lỗi HTML trong Google Docs</h2>
+    <div class="control-panel">
+        <div class="form-group" style="flex-grow: 3;">
+            <label>Bắt đầu từ chương (trong tên file):</label>
+            <input type="number" id="fix-start-chapter" value="1">
+        </div>
+        <div class="form-group" style="flex-grow: 1;">
+            <label>&nbsp;</label>
+            <button id="start-fix-btn" class="btn btn-secondary">Bắt đầu Sửa</button>
+        </div>
+    </div>
+</div>
+
+<div class="form-section">
+    <h2>5. Tải Chương (Từ Google Docs)</h2>
+    <p style="font-size: 0.9em; color: #6c757d; margin-top: -10px; margin-bottom: 15px;">
+        Tự động tìm file, trích xuất nội dung và lưu vào database. Các trường dưới đây là không bắt buộc.
+    </p>
+    <div class="control-panel">
+        <div class="form-group" style="flex-grow: 2;">
+            <label>Số chương hoặc khoảng chương:</label>
+            <input type="text" id="load-chapters-input" placeholder="1-10 hoặc 123">
+        </div>
+
+        <div class="form-group" style="flex-grow: 3;">
+            <label>Hoặc dán Link Google Docs trực tiếp:</label>
+            <input type="text" id="load-docs-link" placeholder="Để trống nếu muốn tìm tự động">
+        </div>
+    </div>
+    <div class="control-panel" style="margin-top: -10px;">
+         <div class="form-group" style="flex-grow: 3;">
+            <label>Tên tiểu thuyết trong Docs (nếu khác):</label>
+            <input type="text" id="load-docs-novel-name" placeholder="Hỗ trợ tìm kiếm nếu tên file khác tên truyện">
+        </div>
+        <div class="form-group" style="flex-grow: 1;">
+            <label>&nbsp;</label>
+            <button id="start-load-docs-btn" class="btn btn-info">Bắt đầu Tải & Lưu</button>
+        </div>
+    </div>
+</div>
+
+<hr style="margin: 30px 0;">
+
+<div id="selection-controls" style="margin-bottom: 15px; display: none; align-items: center; gap: 15px;">
+    <button id="delete-selected-btn" class="btn btn-danger">Xóa các mục đã chọn (<span id="selected-count">0</span>)</button>
+    <span id="selection-warning" style="color: #dc3545; font-weight: 500;"></span>
+</div>
+
+<h2>Danh sách chương</h2>
+
+<form id="chapters-form" action="{{ url_for('delete_multiple_chapters') }}" method="POST">
+    <table class="table" id="chapters-table">
+        <thead>
+            <tr>
+                <th style="width: 50px;">
+                    <input type="checkbox" id="select-all-chapters" title="Chọn/Bỏ chọn tất cả">
+                </th>
+                <th>Chương</th>
+                <th>Tiêu đề</th>
+                <th style="width: 250px;">Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for chapter in chapters %}
+            <tr data-chapter-id="{{ chapter.id }}">
+                <td>
+                    <input type="checkbox" class="chapter-checkbox" name="chapter_ids[]" value="{{ chapter.id }}">
+                </td>
+                <td data-label="Chương">{{ chapter.chapter_number }}</td>
+                <td data-label="Tiêu đề">{{ chapter.title }}</td>
+                <td data-label="Hành động">
+                    <div class="action-buttons">
+                        <a href="{{ url_for('edit_chapter', chapter_id=chapter.id) }}" class="btn btn-secondary btn-sm">Sửa</a>
+                        <a href="{{ url_for('read_chapter', chapter_id=chapter.id) }}" target="_blank" class="btn btn-primary btn-sm">Đọc</a>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" style="text-align: center;">Chưa có chương nào.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</form>
+
+<div class="form-section">
+    <h3>Thêm chương thủ công</h3>
+    <form action="{{ url_for('add_chapter', novel_id=novel.id) }}" method="post" class="control-panel">
+        <div class="form-group">
+            <label>Số chương</label>
+            <input type="number" name="chapter_number" required>
+        </div>
+        <div class="form-group">
+            <label>Tiêu đề (tùy chọn)</label>
+            <input type="text" name="title">
+        </div>
+        <div class="form-group">
+            <label>&nbsp;</label>
+            <button type="submit" class="btn btn-primary">+ Thêm</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Hàm chung để gửi yêu cầu bắt đầu tác vụ tới backend
+    function startTask(formData) {
+        fetch('/start-task', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.redirect_url) {
+                    // Mở tab mới để không làm gián đoạn trang quản lý
+                    window.open(data.redirect_url, '_blank');
+                } else {
+                    // Hiển thị thông báo lỗi nếu có
+                    alert('Lỗi: ' + (data.error || 'Tham số không hợp lệ.'));
+                }
+            })
+            .catch(error => {
+                console.error('Error starting task:', error);
+                alert('Đã xảy ra lỗi khi kết nối đến máy chủ.');
+            });
+    }
+
+    // Chờ tất cả nội dung trang được tải xong rồi mới chạy script
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // --- PHẦN 1: LOGIC QUẢN LÝ VIỆC CHỌN CHƯƠNG TRONG BẢNG ---
+        const selectAllCheckbox = document.getElementById('select-all-chapters');
+        const chapterCheckboxes = document.querySelectorAll('.chapter-checkbox');
+        const chaptersForm = document.getElementById('chapters-form');
+        const deleteSelectedBtn = document.getElementById('delete-selected-btn');
+        const selectionControls = document.getElementById('selection-controls');
+        const selectedCountSpan = document.getElementById('selected-count');
+        const selectionWarning = document.getElementById('selection-warning');
+        let lastChecked = null; // Dùng cho chức năng Shift + Click
+
+        // Cập nhật giao diện các nút điều khiển (hiện/ẩn nút xóa, đếm số lượng)
+        function updateSelectionControls() {
+            const selectedCount = document.querySelectorAll('.chapter-checkbox:checked').length;
+            if (selectedCount > 0) {
+                selectionControls.style.display = 'flex';
+                selectedCountSpan.textContent = selectedCount;
+            } else {
+                selectionControls.style.display = 'none';
+            }
+        }
+
+        // Sự kiện click cho checkbox "Chọn tất cả"
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('click', function() {
+                chapterCheckboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+                updateSelectionControls();
+            });
+        }
+
+        // Sự kiện click cho từng checkbox của mỗi chương (bao gồm cả logic Shift+Click)
+        chapterCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('click', function(e) {
+                // Logic cho Shift + Click để chọn hàng loạt
+                if (lastChecked && e.shiftKey) {
+                    let start = Array.from(chapterCheckboxes).indexOf(this);
+                    let end = Array.from(chapterCheckboxes).indexOf(lastChecked);
+                    chapterCheckboxes.forEach((cb, index) => {
+                        if ((index > start && index < end) || (index < start && index > end)) {
+                            cb.checked = lastChecked.checked;
+                        }
+                    });
+                }
+                lastChecked = this;
+
+                // Cập nhật lại trạng thái của nút "Chọn tất cả"
+                if (selectAllCheckbox) {
+                    const allChecked = Array.from(chapterCheckboxes).every(cb => cb.checked);
+                    selectAllCheckbox.checked = allChecked;
+                }
+                updateSelectionControls();
+            });
+        });
+
+        // Sự kiện cho nút "Xóa các mục đã chọn"
+        if (deleteSelectedBtn) {
+            deleteSelectedBtn.addEventListener('click', function() {
+                if (confirm('Bạn có chắc muốn xóa tất cả các chương đã chọn? Hành động này không thể hoàn tác.')) {
+                    chaptersForm.submit();
+                }
+            });
+        }
+
+        // --- PHẦN 2: LOGIC XỬ LÝ CÁC NÚT TÁC VỤ (ĐÃ SỬA LỖI VÀ HỢP NHẤT) ---
+        // Chỉ chọn các nút tác vụ (có id bắt đầu bằng "start-") để không ảnh hưởng đến các nút khác như "Thêm".
+        document.querySelectorAll('.control-panel button[id^="start-"]').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault(); // Luôn ngăn hành động mặc định của nút (như submit form)
+
+                const selectedCheckboxes = document.querySelectorAll('.chapter-checkbox:checked');
+                const selectedCount = selectedCheckboxes.length;
+                
+                // Logic của bạn: Nếu chọn nhiều hơn 1 chương thì cảnh báo.
+                // Một số chức năng có thể xử lý nhiều chương (như cải thiện 1-10), 
+                // nhưng ta giữ lại logic này nếu đây là ý đồ của bạn.
+                if (selectedCount > 1) {
+                    alert('Chức năng này chỉ có thể áp dụng cho MỘT chương. Vui lòng chỉ chọn một chương duy nhất.');
+                    return; // Dừng thực thi
+                }
+
+                const formData = new FormData();
+                formData.append('novel_id', '{{ novel.id }}');
+                let isTaskValid = true;
+
+                // Dùng switch-case để xử lý logic cho từng nút cụ thể, đảm bảo đúng `task_type` và tham số.
+                switch (this.id) {
+                    case 'start-db-translate-btn':
+                        formData.append('task_type', 'translate_to_db');
+                        formData.append('start_chapter', document.getElementById('db-start-chapter').value);
+                        formData.append('end_chapter', document.getElementById('db-end-chapter').value);
+                        break;
+
+                    case 'start-proof-btn':
+                        formData.append('task_type', 'proofread_db');
+                        let proofInput = document.getElementById('proof-chapters');
+                        // Nếu có 1 chương được chọn trong bảng, ưu tiên lấy số chương đó và điền vào ô input.
+                        if (selectedCount === 1) {
+                            const chapterRow = selectedCheckboxes[0].closest('tr');
+                            proofInput.value = chapterRow.querySelector('td[data-label="Chương"]').textContent.trim();
+                        }
+                        if (!proofInput.value) {
+                            alert('Vui lòng nhập số chương hoặc chọn một chương từ danh sách.');
+                            isTaskValid = false;
+                        }
+                        formData.append('chapters', proofInput.value); // Gửi đi với key là 'chapters'
+                        break;
+
+                    case 'start-auto-btn':
+                        formData.append('task_type', 'auto_translate');
+                        formData.append('start_chapter', document.getElementById('auto-start-chapter').value);
+                        formData.append('save_to_docs', document.getElementById('auto-save-docs-checkbox').checked ? 'on' : 'off');
+                        formData.append('doc_id', document.getElementById('auto-doc-id').value);
+                        break;
+
+                    case 'start-fix-btn':
+                        formData.append('task_type', 'fix_docs');
+                        formData.append('start_chapter', document.getElementById('fix-start-chapter').value);
+                        break;
+
+                    case 'start-load-docs-btn':
+                        formData.append('task_type', 'load_from_docs');
+                        let loadInput = document.getElementById('load-chapters-input');
+                         // Tương tự, ưu tiên chương được chọn trong bảng
+                        if (selectedCount === 1) {
+                            const chapterRow = selectedCheckboxes[0].closest('tr');
+                            loadInput.value = chapterRow.querySelector('td[data-label="Chương"]').textContent.trim();
+                        }
+                        formData.append('chapters', loadInput.value);
+                        formData.append('doc_link', document.getElementById('load-docs-link').value);
+                        formData.append('alt_novel_name', document.getElementById('load-docs-novel-name').value);
+                        break;
+                }
+
+                // Nếu tác vụ hợp lệ, gọi hàm startTask
+                if (isTaskValid) {
+                    startTask(formData);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

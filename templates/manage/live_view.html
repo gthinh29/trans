@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<h1>{{ title }}</h1>
+<div class="control-panel" style="justify-content: center;">
+    <button id="stop-button" class="stop-btn" style="display: inline-block;">Dừng Quá Trình</button>
+</div>
+<div class="status-bar" id="status-bar" style="background-color: #6c757d;">Sẵn sàng</div>
+
+{% if view_type == 'log' %}
+<div class="log-grid">
+    <div>
+        <h3>Nhật ký hoạt động (Log)</h3>
+        <div id="log-area" class="log-area"></div>
+    </div>
+</div>
+{% else %}
+<div class="display-grid">
+    <div>
+        <h3>Văn bản gốc / Nội dung cũ</h3>
+        <div id="original-text" class="text-area"></div>
+    </div>
+    <div>
+        <h3>Bản dịch (Live) / Nội dung mới</h3>
+        <div id="translated-text" class="text-area"></div>
+    </div>
+</div>
+{% endif %}
+
+<div style="margin-top: 20px;">
+    <a href="{{ request.referrer or url_for('manage_dashboard') }}" class="btn btn-secondary">&larr; Quay lại trang trước</a>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    const taskId = "{{ task_id }}";
+    
+    const elements = {
+        startButton: document.createElement('button'), // Tạo nút giả để hàm finalize hoạt động
+        stopButton: document.getElementById('stop-button'),
+        statusBar: document.getElementById('status-bar'),
+        originalTextArea: document.getElementById('original-text'),
+        translatedTextArea: document.getElementById('translated-text'),
+        logArea: document.getElementById('log-area') || document.getElementById('original-text'),
+    };
+    elements.startButton.style.display = 'none';
+    document.body.appendChild(elements.startButton);
+
+    // Bắt đầu stream ngay khi trang tải
+    handleStream(taskId, elements);
+</script>
+{% endblock %}
